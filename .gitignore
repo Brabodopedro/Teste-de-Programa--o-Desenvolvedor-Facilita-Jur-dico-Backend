@@ -1,0 +1,17 @@
+# Ignorar node_modules em ambos backend e frontend
+node_modules/
+
+# Ignorar arquivos de build do React
+/build
+
+# Ignorar arquivos de ambiente
+.env
+
+# Ignorar arquivos de configuração específicos do usuário
+*.config.js
+
+# Ignorar arquivos de log
+*.log
+
+# Ignorar arquivos temporários
+*.tmp
