@@ -15,8 +15,6 @@ const pool = new Pool({
 
 const cors = require('cors');
 app.use(cors());
-
-
 app.use(bodyParser.json());
 
 // Rotas para manipular clientes
@@ -31,11 +29,10 @@ app.get('/clientes', async (req, res) => {
     }
 });
 
-
 app.post('/clientes', async (req, res) => {
     try {
-        const { nome, email, telefone } = req.body;
-        const result = await pool.query('INSERT INTO clientes (nome, email, telefone) VALUES ($1, $2, $3) RETURNING *', [nome, email, telefone]);
+        const { nome, email, telefone, casa } = req.body;
+        const result = await pool.query('INSERT INTO clientes (nome, email, telefone, casa) VALUES ($1, $2, $3, $4) RETURNING *', [nome, email, telefone, casa]);
         res.json(result.rows[0]);
     } catch (error) {
         console.error('Erro ao cadastrar cliente:', error);
