@@ -31,8 +31,8 @@ app.get('/clientes', async (req, res) => {
 
 app.post('/clientes', async (req, res) => {
     try {
-        const { nome, email, telefone, casa } = req.body;
-        const result = await pool.query('INSERT INTO clientes (nome, email, telefone, casa) VALUES ($1, $2, $3, $4) RETURNING *', [nome, email, telefone, casa]);
+        const { nome, email, telefone, casa, x, y } = req.body;
+        const result = await pool.query('INSERT INTO clientes (nome, email, telefone, casa, x, y) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *', [nome, email, telefone, casa, x, y]);
         res.json(result.rows[0]);
     } catch (error) {
         console.error('Erro ao cadastrar cliente:', error);
