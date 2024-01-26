@@ -47,30 +47,6 @@ module.exports = {
     calcularMenorRota,
 };
 
-function calcularMenorRota(coordenadas, casasSelecionadas) {
-    const ordemDeVisita = [0]; // Começando na empresa (0,0)
-
-    while (ordemDeVisita.length < coordenadas.length) {
-        const pontoAtual = coordenadas[ordemDeVisita[ordemDeVisita.length - 1]];
-        const pontoMaisProximo = encontrarPontoMaisProximo(pontoAtual, coordenadas, ordemDeVisita, casasSelecionadas);
-        if (pontoMaisProximo !== -1) {
-            ordemDeVisita.push(pontoMaisProximo);
-        }
-    }
-
-    // Garantir que a Empresa (0,0) esteja sempre no início da ordem de visita
-    const empresaIndex = ordemDeVisita.indexOf(0);
-    if (empresaIndex !== 0) {
-        // Trocar a posição da Empresa com o primeiro elemento
-        const temp = ordemDeVisita[0];
-        ordemDeVisita[0] = ordemDeVisita[empresaIndex];
-        ordemDeVisita[empresaIndex] = temp;
-    }
-
-    return ordemDeVisita;
-}
-
-
 // Função para encontrar o ponto mais próximo
 function encontrarPontoMaisProximo(pontoAtual, coordenadas, ordemDeVisita, casasSelecionadas) {
     let pontoMaisProximo = -1;
@@ -89,10 +65,21 @@ function encontrarPontoMaisProximo(pontoAtual, coordenadas, ordemDeVisita, casas
     return pontoMaisProximo;
 }
 
+// Função para calcular a menor rota entre as casas selecionadas
+function calcularMenorRota(coordenadas, casasSelecionadas) {
+    const casasFiltradas = coordenadas.filter(cliente => casasSelecionadas.includes(Number(cliente.casa)));
+
+    const ordemDeVisita = casasFiltradas
+        .sort((a, b) => casasSelecionadas.indexOf(Number(a.casa)) - casasSelecionadas.indexOf(Number(b.casa)))
+        .map(cliente => cliente.id);
+
+    return ordemDeVisita;
+}
 // Função para calcular a distância entre dois pontos
 function calcularDistancia(pontoA, pontoB) {
     return Math.sqrt(Math.pow(pontoB.x - pontoA.x, 2) + Math.pow(pontoB.y - pontoA.y, 2));
 }
+
 // Rota para calcular a rota com base nas casas selecionadas
 app.post('/calcula-rota', async (req, res) => {
     try {
@@ -100,12 +87,12 @@ app.post('/calcula-rota', async (req, res) => {
 
         console.log('Casas Selecionadas:', casasSelecionadas);
 
-        // Consulta apenas os clientes das casas selecionadas
+        // Consulta os clientes das casas selecionadas
         const clientes = await pool.query('SELECT * FROM clientes WHERE casa::integer = ANY($1::int[])', [casasSelecionadas]);
 
         console.log('Clientes Filtrados:', clientes.rows);
 
-        const coordenadasClientes = clientes.rows.map(cliente => ({ id: cliente.id, x: cliente.x, y: cliente.y, casa: cliente.casa }));
+        const coordenadasClientes = clientes.rows.map(cliente => ({ id: cliente.id, x: Number(cliente.x), y: Number(cliente.y), casa: cliente.casa }));
 
         console.log('Coordenadas dos Clientes:', coordenadasClientes);
 
